@@ -1,0 +1,14 @@
+pipeline {
+    agent any
+        stages{
+            stage{
+                echo "this is automation test :)"
+            }
+        }
+        post 
+        {
+            always {
+             echo "Pipeline finished!!"
+            }
+        }
+}
