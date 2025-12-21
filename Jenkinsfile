@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Automation Test') {
             steps {
-                echo "this is automation test :)"
+                echo "this is automation test V :)"
             }
         }
     }
