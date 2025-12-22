@@ -1,17 +1,30 @@
 pipeline {
     agent any
-
+    environment {
+        APP_ENV = "Netflix"
+    }
     stages {
-        stage('Automation Test') {
+        stage ('build') {
             steps {
-                echo "this is automation test V :)"
+                echo "Building...!"
+            }
+        }
+        stage ('test') {
+            steps {
+                echo " ${APP_ENV} app is running successfully!"
+                echo " Build number is ${BUILD_NUMBER}"
+                echo " Job name is ${JOB_NAME}"
+                echo " Workspace path is ${WORKSPACE}"
+
             }
         }
     }
-
     post {
-        always {
-            echo "Pipeline finished!!!!"
+        success {
+            echo "pipeline succeeded!"
+        }
+        failure {
+            echo "pipeline failed! "
         }
     }
 }
