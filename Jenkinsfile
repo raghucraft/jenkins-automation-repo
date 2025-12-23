@@ -1,30 +1,54 @@
 pipeline {
     agent any
+    parameters {
+        string(name: 'APP_NAME', defaultValue: 'Netflix', description: 'This is for Netflix app')
+        string(name: 'APP_VERSION', defaultValue: '1.0', description: 'This is for app version')
+        choice(name: 'ENV', choices: ['dev', 'stage', 'prod'], description: 'Select the environment')
+        booleanParam(name: 'IS_PROD', defaultValue: true, description: 'Is this production deployment?') 
+    }
     environment {
-        APP_ENV = "Netflix"
+        APP_ENV = "${params.APP_NAME}"
     }
     stages {
-        stage ('build') {
+        stage('Info') {
             steps {
-                echo "Building...!"
+                echo "Application Name is ${params.APP_NAME}"
+                echo "Application Version is ${params.APP_VERSION}"
+                echo "Environment selected is ${params.ENV}"
+                echo "Is production deployment? : ${params.IS_PROD}"
             }
         }
-        stage ('test') {
+        stage('build') {
             steps {
-                echo " ${APP_ENV} app is running successfully!"
-                echo " Build number is ${BUILD_NUMBER}"
-                echo " Job name is ${JOB_NAME}"
-                echo " Workspace path is ${WORKSPACE}"
-
+                echo "Building ${params.APP_NAME}:${params.APP_VERSION}"
+                sh 'echo Build step simulated'
+            }
+        }
+        stage('test') {
+            when {
+                expression { params.IS_PROD }
+            }
+            steps {
+                echo "Running tests for production deployment"
+                sh 'echo Test step stimulated'
+            }
+        }
+        stage('deploy') {
+            steps {
+                echo "Deploying ${params.APP_NAME}: ${params.APP_VERSION}"
+                sh 'echo Deploy step stimulated'
             }
         }
     }
     post {
         success {
-            echo "pipeline succeeded!"
+            echo "Pipeline completed successfully"
         }
         failure {
-            echo "pipeline failed! "
+            echo "Pipeline failed"
+        }
+        always {
+            echo "Pipeline finished (success or failure)"
         }
     }
 }
