@@ -18,6 +18,48 @@ pipeline {
                 echo "Is production deployment? : ${params.IS_PROD}"
             }
         }
+        stage('Secret text test') {
+            steps {
+                withCredentials(
+                    [string(credentialsId: 'api-token', variable: 'API_TOKEN')])
+                    {
+                        sh '''
+                            echo "API call started"
+                            curl -H "Authorization: Bearer $API_TOKEN" https://example.com/api/data
+                            echo "API call completed"
+                        '''
+                    }                    
+            }
+        }
+        stage('secret with db creds') {
+            steps {
+                withCredentials(
+                    [
+                        usernamePassword(
+                            credentialsId: 'db-creds',
+                            usernameVariable: 'DB_USER',
+                            passwordVariable: 'DB_PASSWORD'
+
+                        )
+                    ]
+                )
+                {
+                    sh '''
+                        echo "Connecting to database with user $DB_USER"
+                        # Simulate database connection
+                        echo "Connected to database successfully"
+                    '''
+                }
+            }
+        }
+        stage('Scope Check') {
+            steps {
+                sh '''
+                echo "API_TOKEN outside block: $API_TOKEN"
+                echo "DB_PASS outside block: $DB_PASS"
+                '''
+            }
+            }
         stage('build') {
             steps {
                 echo "Building ${params.APP_NAME}:${params.APP_VERSION}"
