@@ -4,18 +4,17 @@ pipeline {
         string(name: 'APP_NAME', defaultValue: 'Netflix', description: 'This is for Netflix app')
         string(name: 'APP_VERSION', defaultValue: '1.0', description: 'This is for app version')
         choice(name: 'ENV', choices: ['dev', 'stage', 'prod'], description: 'Select the environment')
-        booleanParam(name: 'IS_PROD', defaultValue: true, description: 'Is this production deployment?') 
     }
     environment {
         APP_ENV = "${params.APP_NAME}"
-    }
+        IS_PROD = "${params.ENV == 'prod'}"
+       }
     stages {
         stage('Info') {
             steps {
                 echo "Application Name is ${params.APP_NAME}"
                 echo "Application Version is ${params.APP_VERSION}"
                 echo "Environment selected is ${params.ENV}"
-                echo "Is production deployment? : ${params.IS_PROD}"
             }
         }
         stage('Secret text test') {
@@ -68,7 +67,9 @@ pipeline {
         }
         stage('test') {
             when {
-                expression { params.IS_PROD }
+                allOf {
+                expression { env.IS_PROD.toBoolean() }
+                }
             }
             steps {
                 echo "Running tests for production deployment"
